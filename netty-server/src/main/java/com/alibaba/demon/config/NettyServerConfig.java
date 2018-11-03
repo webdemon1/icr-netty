@@ -14,7 +14,7 @@ import java.net.InetSocketAddress;
 import java.util.Map;
 
 @Configuration
-public class NettyConfig {
+public class NettyServerConfig {
 
     @Value("${boss.thread.count}")
     private int bossCount;

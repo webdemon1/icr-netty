@@ -1,0 +1,19 @@
+
+#tcp监听的端口
+tcp:
+  port: 8001
+
+# bossGroup的线程数
+boss:
+  thread:
+    count: 4
+
+# worker的线程数
+worker:
+  thread:
+    count: 4
+
+#是否使用长连接
+icr:
+  keepalive:  true
+  backlog: 100
