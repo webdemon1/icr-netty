@@ -1,5 +1,6 @@
 package com.alibaba.demon.config;
 
+import com.alibaba.demon.handler.TcpClientHandler;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
@@ -28,7 +29,8 @@ public class NettyClientConfig {
     private int backlog;
 
     @Bean(name = "bootstrap")
-    public Bootstrap bootstrap(NioEventLoopGroup workerGroup) {
+    public Bootstrap bootstrap(NioEventLoopGroup workerGroup,
+                               TcpClientHandler tcpClientHandler) {
         Bootstrap b = new Bootstrap();
         b.group(workerGroup);
         b.channel(NioSocketChannel.class);
@@ -36,7 +38,7 @@ public class NettyClientConfig {
         b.handler(new ChannelInitializer<SocketChannel>() {
             @Override
             protected void initChannel(SocketChannel socketChannel) {
-                //socketChannel.pipeline().addLast(new ClientHandler());
+                socketChannel.pipeline().addLast(tcpClientHandler);
             }
         });
         return b;

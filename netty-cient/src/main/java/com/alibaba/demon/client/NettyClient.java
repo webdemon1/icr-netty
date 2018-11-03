@@ -38,7 +38,6 @@ public class NettyClient {
         }
     }
 
-
     @PreDestroy
     public void stop() {
         try {
@@ -47,6 +46,5 @@ public class NettyClient {
             log.error("@NettyServer.stop exception", ex);
         }
     }
-
 
 }

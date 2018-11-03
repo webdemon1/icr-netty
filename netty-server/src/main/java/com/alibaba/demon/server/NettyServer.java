@@ -12,7 +12,7 @@ import javax.annotation.Resource;
 import java.net.InetSocketAddress;
 import java.util.Objects;
 
-@Component
+@Component("nettyServer")
 @Slf4j
 public class NettyServer {
     @Resource

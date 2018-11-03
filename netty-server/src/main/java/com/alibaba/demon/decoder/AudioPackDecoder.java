@@ -14,10 +14,9 @@ import java.util.List;
 @Scope("prototype")
 public class AudioPackDecoder extends ByteToMessageDecoder {
 
-
     @Override
-    protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
-
+    protected void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) {
+        log.info("@AudioPackDecoder.decode byteBuf:{}", byteBuf);
     }
 
 
