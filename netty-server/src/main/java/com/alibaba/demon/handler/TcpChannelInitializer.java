@@ -3,7 +3,6 @@ package com.alibaba.demon.handler;
 import com.alibaba.demon.decoder.AudioPackDecoder;
 import com.alibaba.fastjson.JSON;
 import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
@@ -26,6 +25,9 @@ public class TcpChannelInitializer extends ChannelInitializer<SocketChannel> {
         log.info("@TcpChannelInitializer.initChannel sc:{}", JSON.toJSONString(sc));
         AudioPackDecoder audioPackDecoder = applicationContext.getBean(AudioPackDecoder.class);
         sc.pipeline().addLast(audioPackDecoder);
+
+        Speech2TextHandler speech2TextHandler = applicationContext.getBean(Speech2TextHandler.class);
+        sc.pipeline().addLast(speech2TextHandler);
     }
 
 

@@ -45,26 +45,20 @@ public class AudioPackDecoder extends ByteToMessageDecoder {
                 log.info("@AudioPackDecoder.decode microPhoneNo:{}", id);
 
                 // 读取 seq 4byte
-                byteBuf.resetReaderIndex();
                 int seq = byteBuf.readInt();
                 audioPack.setSeq(seq);
 
                 // 读取 type 1byte
-                byteBuf.resetReaderIndex();
                 byte type = byteBuf.readByte();
                 audioPack.setType(type);
 
                 // 读取 tag 1byte
-                byteBuf.resetReaderIndex();
                 byte tag = byteBuf.readByte();
                 audioPack.setTag(tag);
 
                 // 读取 dataLen 2byte
-                byteBuf.resetReaderIndex();
                 dataLen = byteBuf.readShort();
                 audioPack.setDataLen(dataLen);
-
-                byteBuf.resetReaderIndex();
                 break;
             }
         }
@@ -73,6 +67,7 @@ public class AudioPackDecoder extends ByteToMessageDecoder {
             byteBuf.readerIndex(readerIndex);
             return;
         }
+
         // 读取data数据
         byte[] data = new byte[dataLen];
         byteBuf.readBytes(data);
