@@ -8,12 +8,23 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @Component("audioPackDecoder")
 @Slf4j
 @Scope("prototype")
+@SuppressWarnings("all")
 public class AudioPackDecoder extends ByteToMessageDecoder {
+
+    private Integer microNo;
+
+    private File pcmFile;
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) {
@@ -22,13 +33,14 @@ public class AudioPackDecoder extends ByteToMessageDecoder {
         AudioPack audioPack = new AudioPack();
         short dataLen;
         int readerIndex;
+        int id;
         while (true) {
             if (byteBuf.readableBytes() >= 12) {
                 readerIndex = byteBuf.readerIndex();
                 byteBuf.markReaderIndex();
 
                 // 读取 id 4byte
-                int id = byteBuf.readInt();
+                id = byteBuf.readInt();
                 audioPack.setId(id);
                 log.info("@AudioPackDecoder.decode microPhoneNo:{}", id);
 
@@ -67,8 +79,43 @@ public class AudioPackDecoder extends ByteToMessageDecoder {
         audioPack.setData(data);
 
         log.info("@audioPackDecoder.decode audioPack:{}", audioPack);
+
+        createPcmFile(microNo);
+        writeAudio2Disk(data, dataLen);
         out.add(audioPack);
     }
 
+    /**
+     *  创建文件
+     * @am id
+     */
+    private void createPcmFile(int id) {
+        if (Objects.isNull(id)) {
+            try {
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
+                this.microNo = id;
+                pcmFile = new File( "/Users/admin/Documents/tmp"+File.separator + sdf.format(new Date()) + "_" + id + "netty.pcm");
+                pcmFile.createNewFile();
+            } catch (IOException ex) {
+                log.error("@audioPackDecoder.writeAudio2Disk exception", ex);
+            }
+        }
+
+    }
+
+    /**
+     * 写数据
+     * @param buffer
+     * @param length
+     */
+    private void writeAudio2Disk(byte[] buffer, int length) {
+        try {
+            FileOutputStream fos = new FileOutputStream(pcmFile, true);
+            fos.write(buffer, 0, length);
+            fos.close();
+        } catch (Exception ex) {
+            log.error("@audioPackDecoder.writeAudio2Disk exception", ex);
+        }
+    }
 
 }
