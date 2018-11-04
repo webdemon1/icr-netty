@@ -15,7 +15,7 @@ public class AudioPack {
 
     private byte tag;               //
 
-    private short datalen;          // 数据长度   char的长度
+    private short dataLen;          // 数据长度   char的长度
 
     private byte data[];            // pcm数据
 
@@ -26,7 +26,7 @@ public class AudioPack {
                 ", seq=" + seq +
                 ", type=" + type +
                 ", tag=" + tag +
-                ", datalen=" + datalen +
+                ", dataLen=" + dataLen +
                 ", data=" + Arrays.toString(data) +
                 '}';
     }
