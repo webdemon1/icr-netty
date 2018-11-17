@@ -31,40 +31,37 @@ public class AudioPackDecoder extends ByteToMessageDecoder {
         log.info("@AudioPackDecoder.decode byteBuf:{}", byteBuf);
 
         AudioPack audioPack = new AudioPack();
-        short dataLen;
-        int readerIndex;
-        int id;
-        while (true) {
-            if (byteBuf.readableBytes() >= 12) {
-                readerIndex = byteBuf.readerIndex();
-                byteBuf.markReaderIndex();
 
-                // 读取 id 4byte
-                id = byteBuf.readInt();
-                audioPack.setId(id);
-                log.info("@AudioPackDecoder.decode microPhoneNo:{}", id);
-
-                // 读取 seq 4byte
-                int seq = byteBuf.readInt();
-                audioPack.setSeq(seq);
-
-                // 读取 type 1byte
-                byte type = byteBuf.readByte();
-                audioPack.setType(type);
-
-                // 读取 tag 1byte
-                byte tag = byteBuf.readByte();
-                audioPack.setTag(tag);
-
-                // 读取 dataLen 2byte
-                dataLen = byteBuf.readShort();
-                audioPack.setDataLen(dataLen);
-                break;
-            }
+        if (byteBuf.readableBytes() < 12) {
+            return;
         }
 
+        int readerIndex = byteBuf.readerIndex();
+        byteBuf.markReaderIndex();
+
+        // 读取 id 4byte
+        int id = byteBuf.readInt();
+        audioPack.setId(id);
+        log.info("@AudioPackDecoder.decode microPhoneNo:{}", id);
+
+        // 读取 seq 4byte
+        int seq = byteBuf.readInt();
+        audioPack.setSeq(seq);
+
+        // 读取 type 1byte
+        byte type = byteBuf.readByte();
+        audioPack.setType(type);
+
+        // 读取 tag 1byte
+        byte tag = byteBuf.readByte();
+        audioPack.setTag(tag);
+
+        // 读取 dataLen 2byte
+        short dataLen = byteBuf.readShort();
+        audioPack.setDataLen(dataLen);
+
         if (byteBuf.readableBytes() < dataLen) {
-            byteBuf.readerIndex(readerIndex);
+            byteBuf.resetReaderIndex();
             return;
         }
 
@@ -81,7 +78,8 @@ public class AudioPackDecoder extends ByteToMessageDecoder {
     }
 
     /**
-     *  创建文件
+     * 创建文件
+     *
      * @am id
      */
     private void createPcmFile(int id) {
@@ -89,7 +87,7 @@ public class AudioPackDecoder extends ByteToMessageDecoder {
             try {
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
                 this.microNo = id;
-                pcmFile = new File( "/Users/admin/Documents/tmp"+File.separator + sdf.format(new Date()) + "_" + id + "netty.pcm");
+                pcmFile = new File("/Users/admin/Documents/tmp" + File.separator + sdf.format(new Date()) + "_" + id + "netty.pcm");
                 pcmFile.createNewFile();
             } catch (IOException ex) {
                 log.error("@audioPackDecoder.writeAudio2Disk exception", ex);
@@ -100,6 +98,7 @@ public class AudioPackDecoder extends ByteToMessageDecoder {
 
     /**
      * 写数据
+     *
      * @param buffer
      * @param length
      */
