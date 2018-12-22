@@ -1,6 +1,5 @@
 package com.alibaba.demon.server;
 
-import com.alibaba.fastjson.JSON;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import lombok.extern.slf4j.Slf4j;
@@ -10,7 +9,6 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 import java.net.InetSocketAddress;
-import java.util.Objects;
 
 @Component("nettyServer")
 @Slf4j
@@ -27,12 +25,9 @@ public class NettyServer {
     public void start() {
         try {
             channelFuture = serverBootstrap.bind(tcpPort).sync();
-            if (Objects.nonNull(channelFuture) && channelFuture.isSuccess()) {
-                log.info("********  NettyServer start success at tcpPort:{} *****", tcpPort.getPort());
-            } else {
-                log.error("@NettyServer iint error. channelFuture:{}", JSON.toJSONString(channelFuture));
-            }
-        } catch (Exception ex) {
+            log.info("********  NettyServer start success at tcpPort:{} *****", tcpPort.getPort());
+        }
+        catch (Exception ex) {
             log.error("@NettyServer.start exception", ex);
         }
     }
@@ -41,7 +36,8 @@ public class NettyServer {
     public void stop() {
         try {
             channelFuture.channel().closeFuture().sync();
-        } catch (Exception ex) {
+        }
+        catch (Exception ex) {
             log.error("@NettyServer.stop exception", ex);
         }
     }
