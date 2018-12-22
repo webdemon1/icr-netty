@@ -9,13 +9,16 @@ import org.springframework.cache.CacheManager;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
-import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializationContext;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import javax.annotation.Resource;
 import java.util.concurrent.Executors;
@@ -24,23 +27,26 @@ import java.util.concurrent.Executors;
 public class RedisConfig {
 
     @Resource
-    JedisConnectionFactory jedisConnectionFactory;
+    private RedisConnectionFactory redisConnectionFactory;
 
     @Bean
     public RedisTemplate<String, Object> redisTemplate() {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
-        redisTemplate.setConnectionFactory(jedisConnectionFactory);
+        redisTemplate.setConnectionFactory(redisConnectionFactory);
         final ObjectMapper mapper = new ObjectMapper();
         redisTemplate.setDefaultSerializer(new GenericJackson2JsonRedisSerializer(mapper));
         return redisTemplate;
     }
 
     @Bean
-    public CacheManager cacheManager(RedisTemplate redisTemplate) {
-        RedisCacheManager cacheManager = new RedisCacheManager(redisTemplate);
-        //设置缓存过期时间
-        cacheManager.setDefaultExpiration(60 * 60 * 24);
-        return cacheManager;
+    public CacheManager employeeCacheManager(RedisConnectionFactory
+                                                     redisConnectionFactory) {
+        final ObjectMapper mapper = new ObjectMapper();
+        RedisCacheConfiguration config = RedisCacheConfiguration
+                .defaultCacheConfig()
+                .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
+                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer(mapper)));
+        return RedisCacheManager.builder(redisConnectionFactory).cacheDefaults(config).build();
     }
 
     @Bean
@@ -51,7 +57,7 @@ public class RedisConfig {
     @Bean
     RedisMessageListenerContainer redisContainer() {
         final RedisMessageListenerContainer container = new RedisMessageListenerContainer();
-        container.setConnectionFactory(jedisConnectionFactory);
+        container.setConnectionFactory(redisConnectionFactory);
         container.addMessageListener(messageListener(), topic());
         container.setTaskExecutor(Executors.newFixedThreadPool(4));
         return container;
