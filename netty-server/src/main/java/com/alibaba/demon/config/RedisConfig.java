@@ -39,7 +39,7 @@ public class RedisConfig {
     }
 
     @Bean
-    public CacheManager employeeCacheManager(RedisConnectionFactory
+    public CacheManager cacheManager(RedisConnectionFactory
                                                      redisConnectionFactory) {
         final ObjectMapper mapper = new ObjectMapper();
         RedisCacheConfiguration config = RedisCacheConfiguration
