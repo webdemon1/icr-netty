@@ -20,17 +20,13 @@ import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSeriali
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-import javax.annotation.Resource;
 import java.util.concurrent.Executors;
 
 @Configuration
 public class RedisConfig {
 
-    @Resource
-    private RedisConnectionFactory redisConnectionFactory;
-
     @Bean
-    public RedisTemplate<String, Object> redisTemplate() {
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory);
         final ObjectMapper mapper = new ObjectMapper();
@@ -39,8 +35,7 @@ public class RedisConfig {
     }
 
     @Bean
-    public CacheManager cacheManager(RedisConnectionFactory
-                                                     redisConnectionFactory) {
+    public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
         final ObjectMapper mapper = new ObjectMapper();
         RedisCacheConfiguration config = RedisCacheConfiguration
                 .defaultCacheConfig()
@@ -55,17 +50,20 @@ public class RedisConfig {
     }
 
     @Bean
-    RedisMessageListenerContainer redisContainer() {
+    RedisMessageListenerContainer redisContainer(MessageListenerAdapter messageListenerAdapter,
+                                                 RedisConnectionFactory redisConnectionFactory,
+                                                 ChannelTopic topic) {
         final RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(redisConnectionFactory);
-        container.addMessageListener(messageListener(), topic());
+        container.addMessageListener(messageListenerAdapter, topic);
         container.setTaskExecutor(Executors.newFixedThreadPool(4));
         return container;
     }
 
     @Bean
-    MessagePublisher messagePublisher() {
-        return new MessagePublisherImpl(redisTemplate(), topic());
+    MessagePublisher messagePublisher(RedisTemplate<String, Object> redisTemplate,
+                                      ChannelTopic topic) {
+        return new MessagePublisherImpl(redisTemplate, topic);
     }
 
     @Bean
