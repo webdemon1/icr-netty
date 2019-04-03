@@ -19,25 +19,20 @@ public class NettyClient {
     private ChannelFuture channelFuture;
 
     @PostConstruct
-    public void start() {
-        try {
-            channelFuture = bootstrap.connect().sync();
-            if (channelFuture.isSuccess()) {
-                log.info("******** NettyClient init success *****");
-            }
+    public void start() throws InterruptedException {
+        channelFuture = bootstrap.connect().sync();
+        if (channelFuture.isSuccess()) {
+            log.info("******** NettyClient init success *****");
         }
-        catch (Exception ex) {
-            log.error("@NettyClient.start exception", ex);
+        else {
+            log.error("NettyClient init fail");
         }
     }
 
     @PreDestroy
-    public void stop() {
-        try {
-            channelFuture.channel().closeFuture().sync();
-        } catch (Exception ex) {
-            log.error("@NettyServer.stop exception", ex);
-        }
+    public void stop() throws InterruptedException {
+        channelFuture.channel().closeFuture().sync();
+
     }
 
 }
