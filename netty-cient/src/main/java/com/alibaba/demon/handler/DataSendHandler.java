@@ -6,16 +6,12 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-
 @Component
 public class DataSendHandler extends SimpleChannelInboundHandler<Object> {
 
-    private ByteBuf firstMessage;
-
-    @PostConstruct
-    public void init() {
-        firstMessage = Unpooled.buffer(256);
+    private static  ByteBuf firstMessage;
+    static {
+          firstMessage = Unpooled.buffer(256);
         for (int i = 0; i < firstMessage.capacity(); i++) {
             firstMessage.writeByte((byte) i);
         }

@@ -2,7 +2,6 @@ package com.alibaba.demon.handler;
 
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -11,11 +10,11 @@ import javax.annotation.Resource;
 public class TcpClientHandler extends ChannelInitializer<SocketChannel> {
 
     @Resource
-    private ApplicationContext applicationContext;
+    private DataSendHandler dataSendHandler;
 
     @Override
     protected void initChannel(SocketChannel ch) {
-         ch.pipeline().addLast(applicationContext.getBean(DataSendHandler.class));
+         ch.pipeline().addLast(dataSendHandler);
     }
 
 }
