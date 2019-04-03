@@ -31,7 +31,7 @@ public class NlsConfig {
 
 
     @Bean
-    @Scope(scopeName = "prototype")
+    @Scope("prototype")
     public SpeechTranscriber transcriber(NlsClient nlsClient, SpeechTranscriberListener speechTranscriberListener) {
         try {
             // Step1 创建实例,建立连接

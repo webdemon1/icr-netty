@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 
 @Component("speechTranscriberListener")
-@Scope(scopeName = "prototype")
+@Scope("prototype")
 @Slf4j
 public class SpeechMessageListener extends SpeechTranscriberListener {
 
