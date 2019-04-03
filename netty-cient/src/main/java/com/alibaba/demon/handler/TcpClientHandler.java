@@ -1,19 +1,21 @@
 package com.alibaba.demon.handler;
 
 import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Scope;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
-@Component("tcpClientHandler")
-@Scope("prototype")
+import javax.annotation.Resource;
+
+@Component
 public class TcpClientHandler extends ChannelInitializer<SocketChannel> {
+
+    @Resource
+    private ApplicationContext applicationContext;
 
     @Override
     protected void initChannel(SocketChannel ch) {
-        ChannelPipeline pipeline = ch.pipeline();
-        pipeline.addLast(new AudioSendHandler());
+         ch.pipeline().addLast(applicationContext.getBean(DataSendHandler.class));
     }
+
 }
