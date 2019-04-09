@@ -32,7 +32,6 @@ public class NettyClient {
     @PreDestroy
     public void stop() throws InterruptedException {
         channelFuture.channel().closeFuture().sync();
-
     }
 
 }
