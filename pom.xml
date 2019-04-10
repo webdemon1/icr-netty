@@ -13,6 +13,8 @@
         <module>netty-server</module>
         <module>netty-cient</module>
         <module>netty-common</module>
+        <module>netty-wsclient</module>
+        <module>netty-wsserver</module>
     </modules>
 
     <parent>
