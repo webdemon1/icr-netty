@@ -34,7 +34,9 @@ public class WsClient {
 
     public static void main(String[] args) throws Exception {
         WsListener wsListener = new WsListener();
-        new WsClient("ws://localhost:8182/ws").connect("", wsListener, 100);
+        Connection connect = new WsClient("ws://localhost:8182/ws").connect("", wsListener, 100);
+
+        connect.sendText("hello server");
     }
 
     private URI webSocketURI;

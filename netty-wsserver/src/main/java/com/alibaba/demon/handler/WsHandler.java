@@ -12,8 +12,7 @@ public class WsHandler extends SimpleChannelInboundHandler<TextWebSocketFrame> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, TextWebSocketFrame textWebSocketFrame) {
-        final String x = textWebSocketFrame.text();
-        final String[] y = x.split(":");
-        ctx.writeAndFlush(new TextWebSocketFrame(y[0] + ":" + y[1].toUpperCase()));
+
+        ctx.writeAndFlush(new TextWebSocketFrame("hello client"));
     }
 }

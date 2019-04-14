@@ -49,8 +49,7 @@ public class WsClientHandler extends SimpleChannelInboundHandler<Object> {
                         response.headers().get("sec-websocket-extensions"));
             } catch (WebSocketHandshakeException e) {
                 FullHttpResponse res = (FullHttpResponse)msg;
-                String errorMsg = String.format("WebSocket Client failed to connect,status:%s,reason:%s", res.status(),
-                        res.content().toString(CharsetUtil.UTF_8));
+                String errorMsg = String.format("WebSocket Client failed to connect,status:%s,reason:%s", res.status(), res.content().toString(CharsetUtil.UTF_8));
                 log.error(errorMsg);
                 handshakeFuture.setFailure(new Exception(errorMsg));
             }
@@ -79,6 +78,16 @@ public class WsClientHandler extends SimpleChannelInboundHandler<Object> {
             listener.onClose(((CloseWebSocketFrame)frame).statusCode(), ((CloseWebSocketFrame)frame).reasonText());
             ch.close();
         }
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        if (!handshakeFuture.isDone()) {
+            handshakeFuture.setFailure(cause);
+        }
+        listener.onError(cause);
+        log.error("error", cause);
+        ctx.close();
     }
 
     public ChannelFuture handshakeFuture() {
