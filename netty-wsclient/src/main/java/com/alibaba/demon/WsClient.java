@@ -1,6 +1,10 @@
-package com.alibaba.demon.ws;
+package com.alibaba.demon;
 
 import com.alibaba.demon.handler.WsClientHandler;
+import com.alibaba.demon.ws.Connection;
+import com.alibaba.demon.ws.ConnectionListener;
+import com.alibaba.demon.ws.WsConnection;
+import com.alibaba.demon.ws.WsListener;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -22,17 +26,21 @@ import lombok.extern.slf4j.Slf4j;
 import java.net.URI;
 
 /**
- *
  * @author: Demon
  * @create: 2019-04-10
  **/
 @Slf4j
 public class WsClient {
 
+    public static void main(String[] args) throws Exception {
+        WsListener wsListener = new WsListener();
+        new WsClient("ws://localhost:8182/ws").connect("", wsListener, 100);
+    }
+
     private URI webSocketURI;
     private int port;
     private SslContext sslCtx;
-    private EventLoopGroup group = new NioEventLoopGroup(0);
+    private EventLoopGroup group = new NioEventLoopGroup();
     private Bootstrap bootstrap = new Bootstrap();
 
     public WsClient(final String uriStr) throws Exception {
@@ -72,16 +80,15 @@ public class WsClient {
     public Connection connect(String token, ConnectionListener listener, int connectionTimeout) throws Exception {
         bootstrap.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectionTimeout);
         HttpHeaders httpHeaders = new DefaultHttpHeaders();
-        //httpHeaders.set();
-        WebSocketClientHandshaker handshaker = WebSocketClientHandshakerFactory
+        WebSocketClientHandshaker handShaker = WebSocketClientHandshakerFactory
                 .newHandshaker(webSocketURI, WebSocketVersion.V13, null, true, httpHeaders);
 
         Channel channel = bootstrap.connect(webSocketURI.getHost(), port).sync().channel();
         log.info("webSocket channel established after sync,connectionId:{}", channel.id());
         WsClientHandler handler = (WsClientHandler) channel.pipeline().get("wsClientHandler");
         handler.setListener(listener);
-        handler.setHandShaker(handshaker);
-        handshaker.handshake(channel);
+        handler.setHandShaker(handShaker);
+        handShaker.handshake(channel);
         handler.handshakeFuture().sync();
         log.info("webSocket connection is established after handshake,connectionId:{}", channel.id());
         return new WsConnection(channel);
