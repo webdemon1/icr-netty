@@ -8,7 +8,6 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- *
  * @author: Demon
  * @create: 2019-04-14
  **/
@@ -28,9 +27,12 @@ public class WsServer {
             final ServerBootstrap b = new ServerBootstrap();
             b.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
+                    .option(ChannelOption.SO_BACKLOG, 1024)
+                    .option(ChannelOption.TCP_NODELAY, true)
+                    .option(ChannelOption.SO_KEEPALIVE, true)
                     .childHandler(new WsServerInitializer());
 
-            ch = b.bind("localhost", 8182).sync().channel();
+            ch = b.bind(8182).sync().channel();
             log.info("---- ws server start success ----");
             ch.closeFuture().sync();
         } finally {
