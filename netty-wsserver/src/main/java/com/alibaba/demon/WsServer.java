@@ -8,6 +8,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import lombok.extern.slf4j.Slf4j;
 
 /**
+ * 参考 https://segmentfault.com/a/1190000015681145
  * @author: Demon
  * @create: 2019-04-14
  **/
