@@ -1,4 +1,4 @@
 # icr-netty
-the project contains a netty server and a netty client, 
-I use it only for test.
+the project contains a tcp server/client, a webSocket server/client
+I used for test.
 
