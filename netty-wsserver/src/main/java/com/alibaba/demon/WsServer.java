@@ -49,7 +49,7 @@ public class WsServer {
                     .option(ChannelOption.SO_BACKLOG, 1024)
                     .option(ChannelOption.TCP_NODELAY, true)
                     .option(ChannelOption.SO_KEEPALIVE, true)
-                    .handler(new LoggingHandler(LogLevel.ERROR))
+                    .handler(new LoggingHandler(LogLevel.INFO))
                     .childHandler(new WsServerInitializer(sslCtx));
 
             ch = b.bind(PORT).sync().channel();

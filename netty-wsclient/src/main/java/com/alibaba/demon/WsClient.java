@@ -62,7 +62,7 @@ public class WsClient {
             @Override
             protected void initChannel(SocketChannel ch) {
                 ChannelPipeline p = ch.pipeline();
-                p.addLast(new LoggingHandler(LogLevel.ERROR));
+                p.addLast(new LoggingHandler(LogLevel.INFO));
                 if (sslCtx != null) {
                     p.addLast(sslCtx.newHandler(ch.alloc(), webSocketURI.getHost(), 443));
                 }
