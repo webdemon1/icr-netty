@@ -18,6 +18,8 @@ import io.netty.handler.codec.http.websocketx.WebSocketClientHandshaker;
 import io.netty.handler.codec.http.websocketx.WebSocketClientHandshakerFactory;
 import io.netty.handler.codec.http.websocketx.WebSocketVersion;
 import io.netty.handler.codec.http.websocketx.extensions.compression.WebSocketClientCompressionHandler;
+import io.netty.handler.logging.LogLevel;
+import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
@@ -34,8 +36,7 @@ public class WsClient {
 
     public static void main(String[] args) throws Exception {
         WsListener wsListener = new WsListener();
-        Connection connect = new WsClient("ws://localhost:8182/ws").connect("", wsListener, 100);
-
+        Connection connect = new WsClient("wss://localhost:8443/ws").connect("Taylor", wsListener, 100);
         connect.sendText("hello server");
     }
 
@@ -45,22 +46,23 @@ public class WsClient {
     private EventLoopGroup group = new NioEventLoopGroup();
     private Bootstrap bootstrap = new Bootstrap();
 
-    public WsClient(final String uriStr) throws Exception {
+    private WsClient(final String uriStr) throws Exception {
         this.webSocketURI = new URI(uriStr);
         final boolean ssl = "wss".equalsIgnoreCase(webSocketURI.getScheme());
         port = webSocketURI.getPort();
         if (ssl) {
             sslCtx = SslContextBuilder.forClient().trustManager(InsecureTrustManagerFactory.INSTANCE).build();
-            if (port == -1) {
-                port = 443;
-            }
         }
-        final String isCompression = System.getProperty("nls.ws.compression", "false");
+
+        final String isCompression = System.getProperty("icr.ws.compression", "false");
+
         bootstrap.option(ChannelOption.TCP_NODELAY, true)
-                .group(group).channel(NioSocketChannel.class).handler(new ChannelInitializer<SocketChannel>() {
+                .group(group).channel(NioSocketChannel.class)
+                .handler(new ChannelInitializer<SocketChannel>() {
             @Override
             protected void initChannel(SocketChannel ch) {
                 ChannelPipeline p = ch.pipeline();
+                p.addLast(new LoggingHandler(LogLevel.ERROR));
                 if (sslCtx != null) {
                     p.addLast(sslCtx.newHandler(ch.alloc(), webSocketURI.getHost(), 443));
                 }
@@ -82,6 +84,8 @@ public class WsClient {
     public Connection connect(String token, ConnectionListener listener, int connectionTimeout) throws Exception {
         bootstrap.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectionTimeout);
         HttpHeaders httpHeaders = new DefaultHttpHeaders();
+        httpHeaders.set("icr-token",token);
+
         WebSocketClientHandshaker handShaker = WebSocketClientHandshakerFactory
                 .newHandshaker(webSocketURI, WebSocketVersion.V13, null, true, httpHeaders);
 

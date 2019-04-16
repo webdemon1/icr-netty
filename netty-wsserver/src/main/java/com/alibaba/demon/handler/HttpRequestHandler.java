@@ -19,7 +19,7 @@ import java.util.Objects;
 @Slf4j
 public class HttpRequestHandler extends SimpleChannelInboundHandler<Object> {
 
-    private String WS_URL = "ws://localhost:8182/ws";
+    private String WS_URL = "wss://localhost:8182/ws";
 
     /**
      *  读取完连接的消息后，对消息进行处理。
@@ -44,10 +44,20 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<Object> {
             return;
         }
 
-        WebSocketServerHandshakerFactory wsFactory = new WebSocketServerHandshakerFactory(
-                WS_URL, null, false);
-        WebSocketServerHandshaker handshaker = wsFactory.newHandshaker(req);
+        // client 权限校验
+        HttpHeaders headers = req.headers();
+        String token = headers.get("icr-token");
+        if (!"Taylor".equals(token)) {
+            sendHttpResponse(ctx, req,
+                    new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.UNAUTHORIZED));
+            ctx.close();
+            return;
+        }
 
+        // handShake
+        WebSocketServerHandshakerFactory wsFactory = new WebSocketServerHandshakerFactory(
+                WS_URL, null, true);
+        WebSocketServerHandshaker handshaker = wsFactory.newHandshaker(req);
         if (Objects.isNull(handshaker)) {
             WebSocketServerHandshakerFactory.sendUnsupportedVersionResponse(ctx.channel());
         } else {

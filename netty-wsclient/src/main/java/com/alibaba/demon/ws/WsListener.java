@@ -31,7 +31,6 @@ public class WsListener implements ConnectionListener {
 
     @Override
     public void onMessage(String message) {
-
         log.info("@WsListener.onMessage msg:{}", message);
     }
 
